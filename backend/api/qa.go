@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"backend/eino"
 	"github.com/gin-gonic/gin"
+	"backend/services"
+	"backend/config"
 )
 
 func Ask(c *gin.Context) {
@@ -18,14 +20,14 @@ func Ask(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
-	// TODO: 构造 Eino RAG 编排输入
+	cfg := config.LoadConfig()
+	qwen := services.NewQwenClient(cfg)
+	milvus := services.InitMilvus(cfg)
 	graph := eino.NewGraph()
-	// TODO: 注册节点
-	// TODO: 传入 Qwen/Milvus/Mongo 依赖
-	graph.AddNode("embed_retrieve", nil)
-	graph.AddNode("rerank", nil)
-	graph.AddNode("llm_answer", nil)
-	graph.AddNode("post_process", nil)
+	graph.AddNode("embed_retrieve", eino.RetrieverNode(qwen, milvus))
+	graph.AddNode("rerank", eino.RerankerNode(qwen))
+	graph.AddNode("llm_answer", eino.LLMAnswerNode(qwen))
+	graph.AddNode("post_process", eino.PostProcessNode())
 	graph.AddEdge("embed_retrieve", "rerank")
 	graph.AddEdge("rerank", "llm_answer")
 	graph.AddEdge("llm_answer", "post_process")
