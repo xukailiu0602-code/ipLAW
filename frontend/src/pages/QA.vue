@@ -1,64 +1,38 @@
 <template>
   <div class="qa-bg">
-    <motion-div class="qa-banner" :initial="{opacity:0, y:-60}" :enter="{opacity:1, y:0, transition:{duration:1.2, type:'spring'}}">
-      <div class="banner-title">知识产权智能问答</div>
-      <div class="banner-desc">AI赋能 · 法律合规 · 智能风控</div>
-    </motion-div>
-    <motion-div class="qa-card-wrap" :initial="{opacity:0, scale:0.95}" :enter="{opacity:1, scale:1, transition:{duration:0.8}}">
-      <a-card class="qa-card" title="智能问答">
-        <a-form @submit.prevent="onAsk">
-          <a-form-item label="问题">
-            <a-input v-model:value="query" placeholder="请输入您的知识产权问题" />
-          </a-form-item>
-          <a-form-item>
-            <a-button type="primary" html-type="submit" :loading="loading" class="ask-btn">
-              <span v-if="!loading">提交</span>
-              <span v-else class="dot-flashing"></span>
-            </a-button>
-          </a-form-item>
-        </a-form>
-        <transition name="fade-slide">
-          <div v-if="answer" class="ai-answer-area">
-            <a-divider>AI 回答</a-divider>
-            <motion-div :initial="{opacity:0, y:30}" :enter="{opacity:1, y:0, transition:{duration:0.7}}">
-              <div class="answer-main">{{answer}}</div>
-            </motion-div>
-            <a-divider>引用片段</a-divider>
-            <ul>
-              <li v-for="c in citations" :key="c">{{c}}</li>
-            </ul>
-            <a-divider>关联法条</a-divider>
-            <ul>
-              <li v-for="l in laws" :key="l.article">{{l.article}}: {{l.description}}</li>
-            </ul>
-            <a-divider>历史类案</a-divider>
-            <ul>
-              <li v-for="cs in cases" :key="cs.caseId">{{cs.caseId}} {{cs.court}} {{cs.year}} 相似度:{{cs.similarity}}</li>
-            </ul>
-            <a-divider>风险评分</a-divider>
-            <div>风险分: {{riskScore}} ({{rationale}})</div>
-          </div>
-        </transition>
-      </a-card>
-    </motion-div>
+    <Banner />
+    <div class="qa-card-wrap">
+      <QAForm @on-ask="handleAsk" :loading="loading" />
+      <transition name="fade-slide">
+        <AIAnswer v-if="showAnswer" :answer="answer" :citations="citations" :laws="laws" :cases="cases" :riskScore="riskScore" :rationale="rationale" />
+      </transition>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
 import { ref, nextTick } from 'vue'
 import { ask } from '../api/qa'
-import { useMotion } from '@vueuse/motion'
+import Banner from './components/Banner.vue'
+import QAForm from './components/QAForm.vue'
+import AIAnswer from './components/AIAnswer.vue'
 import anime from 'animejs'
-const query = ref('')
+
+interface Law { article: string; description: string }
+interface Case { caseId: string; court: string; year: string; similarity: number }
+
 const answer = ref('')
 const citations = ref<string[]>([])
-const laws = ref<any[]>([])
-const cases = ref<any[]>([])
+const laws = ref<Law[]>([])
+const cases = ref<Case[]>([])
 const riskScore = ref(0)
 const rationale = ref('')
 const loading = ref(false)
-const onAsk = async () => {
+const showAnswer = ref(false)
+
+const handleAsk = async (query: string) => {
   loading.value = true
-  const res = await ask({ query: query.value })
+  showAnswer.value = false
+  const res = await ask({ query })
   answer.value = res.answer
   citations.value = res.citations
   laws.value = res.laws
@@ -66,6 +40,7 @@ const onAsk = async () => {
   riskScore.value = res.risk_score
   rationale.value = res.rationale
   loading.value = false
+  showAnswer.value = true
   await nextTick()
   anime({ targets: '.answer-main', opacity: [0,1], translateY: [40,0], duration: 800, easing: 'easeOutExpo' })
 }
