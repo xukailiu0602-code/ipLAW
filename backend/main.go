@@ -6,6 +6,7 @@ import (
 	"backend/config"
 	"backend/services"
 	"github.com/gin-gonic/gin"
+	"backend/api"
 )
 
 func main() {
@@ -16,8 +17,7 @@ func main() {
 	defer vectorClient.Close()
 
 	r := gin.Default()
-	// 路由注册
-	// api.RegisterRoutes(r, mongoClient, vectorClient, cfg)
+	api.RegisterRoutes(r, mongoClient)
 
 	port := os.Getenv("PORT")
 	if port == "" {
