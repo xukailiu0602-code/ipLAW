@@ -1,0 +1,8 @@
+MONGO_URI: "mongodb://localhost:27017"
+MONGO_DB: "iprisk"
+MILVUS_HOST: "localhost"
+MILVUS_PORT: 19530
+MILVUS_USER: ""
+MILVUS_PASS: ""
+QWEN_API_KEY: "your-qwen-api-key"
+QWEN_BASE_URL: "https://dashscope.aliyuncs.com/api/v1"
