@@ -1,0 +1,584 @@
+模型简介
+文本排序模型 (Text ReRank Model)，通常用于语义检索场景，模型可以简单、有效地提升文本检索的效果。给定查询 (Query) 和一系列候选文本 (Documents)，会根据与查询的语义相关性从高到低对候选文本进行排序。 gte-rerank是通义实验室研发的多语言文本统一排序模型，面向全球多个主流语种，提供高水平的文本排序服务。
+
+
+
+
+
+
+模型中文名
+
+模型英文名
+
+最大Document数量
+
+单行最大输入Token
+
+最大输入Token
+
+通用文本排序
+
+gte-rerank
+
+500
+
+4,000
+
+30,000
+
+模型说明：
+
+单行最大输入Token：每个Query或Document的最大Token数量为4,000。如果输入内容超过此长度，将会被截断。
+
+最大Document数量：每次请求中Document的最大数量为500。
+
+最大输入Token：每次请求中所有Query和Document的Token总数不得超过30,000。
+
+模型概览
+
+
+
+
+
+
+模型服务
+
+模型名称
+
+语种支持
+
+单价（每千输入Token）
+
+免费额度
+
+应用场景
+
+通用文本排序
+
+gte-rerank-v2
+
+中、英、日、韩、泰语、西、法、葡、德、印尼语、阿拉伯语等50+语种
+
+0.0008元
+
+100万Token
+
+有效期：百炼开通后180天内
+
+文本语义检索
+
+RAG应用
+
+SDK使用
+前提条件
+您需要已获取API Key并配置API Key到环境变量。如果通过SDK调用，还需要安装DashScope SDK。
+
+调用示例
+以下示例展示了调用文档排序模型API的代码示例。
+
+Python
+
+ 
+import dashscope
+from http import HTTPStatus
+
+
+def text_rerank():
+    resp = dashscope.TextReRank.call(
+        model="gte-rerank-v2",
+        query="什么是文本排序模型",
+        documents=[
+            "文本排序模型广泛用于搜索引擎和推荐系统中，它们根据文本相关性对候选文本进行排序",
+            "量子计算是计算科学的一个前沿领域",
+            "预训练语言模型的发展给文本排序模型带来了新的进展"
+        ],
+        top_n=10,
+        return_documents=True
+    )
+    if resp.status_code == HTTPStatus.OK:
+        print(resp)
+    else:
+        print(resp)
+
+
+if __name__ == '__main__':
+    text_rerank()
+输出示例
+ 
+{
+    "status_code": 200, // 200 indicate success otherwise failed.
+    "request_id": "9676afe6-fa1a-9895-bf00-b8376333062a", // The request id.
+    "code": "", // If failed, the error code.
+    "message": "", // If failed, the error message.
+    "output": {
+         "results": [
+            {
+                "index": 0,
+                "relevance_score": 0.7314485774089865,
+                "document": {
+                    "text": "文本排序模型广泛用于搜索引擎和推荐系统中，它们根据文本相关性对候选文本进行排序"
+                }
+            },
+            {
+                "index": 2,
+                "relevance_score": 0.5831720487049298,
+                "document": {
+                    "text": "预训练语言模型的发展给文本排序模型带来了新的进展"
+                }
+            },
+            {
+                "index": 1,
+                "relevance_score": 0.04973238644524712,
+                "document": {
+                    "text": "量子计算是计算科学的一个前沿领域"
+                }
+            }
+        ]
+    },
+    "usage": {
+        "total_tokens": 79
+    }
+}
+参数详解
+请求参数
+
+
+
+
+
+参数名称
+
+类型
+
+必选
+
+描述
+
+示例值
+
+model
+
+String
+
+是
+
+调用的模型名称，仅可选择gte-rerank-v2
+
+gte-rerank-v2
+
+query
+
+String
+
+是
+
+query最大长度不能超过4,000个Token
+
+"什么是文本排序模型"
+
+documents
+
+List
+
+是
+
+待排序的候选document列表
+
+ 
+[
+    "文本排序模型广泛用于搜索引擎和推荐系统中，它们根据文本相关性对候选文本进行排序",
+    "量子计算是计算科学的一个前沿领域",
+    "预训练语言模型的发展给文本排序模型带来了新的进展"
+]
+top_n
+
+Integer
+
+否
+
+排序返回的top文档数量，未指定时默认返回全部候选文档，如果指定的top_n值大于输入的候选document数量，返回全部候选文档
+
+10
+
+return_documents
+
+Boolean
+
+否
+
+返回的排序结果列表中是否返回每一条document原文，默认值False
+
+False
+
+响应参数
+
+
+
+
+字段
+
+类型
+
+描述
+
+示例值
+
+output.results
+
+Array
+
+本次请求的算法输出内容，是一个结构化的数组。每一个数组中包含一个对应的输入text的算法输出内容
+
+ 
+[
+    {
+    "document": {
+        "text": "文本排序模型广泛用于搜索引擎和推荐系统中，它们根据文本相关性对候选文本进行排序"
+        },
+        "index": 0,
+        "relevance_score": 0.7314485774089865
+    },
+    {
+        "document": {
+        "text": "预训练语言模型的发展给文本排序模型带来了新的进展"
+    },
+        "index": 2,
+        "relevance_score": 0.5831720487049298
+    },
+    {
+        "document": {
+        "text": "量子计算是计算科学的一个前沿领域"
+        },
+        "index": 1,
+        "relevance_score": 0.04973238644524712
+    }
+]
+output.results.index
+
+Integer
+
+本结构中的算法结果对应的document在输入候选documents数组中的位置索引值
+
+0,1,2,3...
+
+output.results.relevance_score
+
+Double
+
+相似度分数取值0.0-1.0之间（浮点型）
+
+0.5831720487049298,0.04973238644524712...
+
+output.results.document
+
+Dict
+
+document原文内容
+
+"量子计算是计算科学的一个前沿领域"
+
+usage
+
+Dict
+
+本次请求消耗的Token数
+
+ 
+{
+    "total_tokens": 79
+}
+request_id
+
+String
+
+本次请求的系统唯一码
+
+7574ee8f-38a3-4b1e-9280-11c33ab4xxxx
+
+HTTP使用说明
+本模型还可通过HTTP的方式进行调用，以适用更灵活的业务开发，下方示例提供了CURL命令，其中用POST方式请求了接口：https://dashscope.aliyuncs.com/api/v1/services/rerank/text-rerank/text-rerank
+
+参数详解
+请求参数
+
+
+
+
+
+
+传参方式
+
+字段
+
+类型
+
+必选
+
+描述
+
+示例值
+
+Header
+
+Content-Type
+
+String
+
+是
+
+请求类型：application/json
+
+application/json
+
+Authorization
+
+String
+
+是
+
+API-KEY的获取方式参考上方文档中的调用前准备
+
+Bearer d1**2a
+
+Body
+
+model
+
+String
+
+是
+
+指明需要调用的模型，仅可选择gte-rerank-v2
+
+gte-rerank-v2
+
+query
+
+String
+
+是
+
+query最大长度不能超过4,000个Token
+
+"什么是文本排序模型"
+
+documents
+
+Array
+
+是
+
+待排序的候选document列表
+
+ 
+[
+    "文本排序模型广泛用于搜索引擎和推荐系统中，它们根据文本相关性对候选文本进行排序",
+    "量子计算是计算科学的一个前沿领域",
+    "预训练语言模型的发展给文本排序模型带来了新的进展"
+]
+parameters.top_n
+
+Integer
+
+否
+
+排序返回的top文档数量，未指定时默认返回全部候选文档，如果指定的top_n值大于输入的候选document数量，返回全部候选文档
+
+10
+
+parameters.return_documents
+
+Boolean
+
+否
+
+返回的排序结果列表中是否返回每一条document原文，默认值False
+
+True
+
+响应参数
+
+
+
+
+字段
+
+类型
+
+描述
+
+示例值
+
+output.results
+
+Array
+
+本次请求的算法输出内容，是一个由结构组成的数组，每一个数组中包含一个对应的输入 text的算法输出内容
+
+ 
+[
+    {
+    "document": {
+        "text": "文本排序模型广泛用于搜索引擎和推荐系统中，它们根据文本相关性对候选文本进行排序"
+        },
+        "index": 0,
+        "relevance_score": 0.7314485774089865
+    },
+    {
+        "document": {
+        "text": "预训练语言模型的发展给文本排序模型带来了新的进展"
+    },
+        "index": 2,
+        "relevance_score": 0.5831720487049298
+    },
+    {
+        "document": {
+        "text": "量子计算是计算科学的一个前沿领域"
+        },
+        "index": 1,
+        "relevance_score": 0.04973238644524712
+    }
+]
+output.results.index
+
+Integer
+
+本结构中的算法结果对应的document在输入候选documents数组中的位置索引值
+
+0,1,2,3...
+
+output.results.relevance_score
+
+Double
+
+相似度分数取值0.0-1.0之间（浮点型）
+
+0.7314485774089865,0.5831720487049298...
+
+output.results.document
+
+Dict
+
+document原文内容
+
+"量子计算是计算科学的一个前沿领域"
+
+usage
+
+Dict
+
+本次请求消耗的Token数
+
+ 
+{
+    "total_tokens": 79
+}
+request_id
+
+String
+
+本次请求的系统唯一请求码
+
+7574ee8f-38a3-4b1e-9280-11c33ab46e51
+
+调用示例
+ 
+curl --location 'https://dashscope.aliyuncs.com/api/v1/services/rerank/text-rerank/text-rerank' \
+--header "Authorization: Bearer $DASHSCOPE_API_KEY" \
+--header 'Content-Type: application/json' \
+--data '{
+    "model": "gte-rerank-v2",
+    "input":{
+         "query": "什么是文本排序模型",
+         "documents": [
+         "文本排序模型广泛用于搜索引擎和推荐系统中，它们根据文本相关性对候选文本进行排序",
+         "量子计算是计算科学的一个前沿领域",
+         "预训练语言模型的发展给文本排序模型带来了新的进展"
+         ]
+    },
+    "parameters": {
+        "return_documents": true,
+        "top_n": 5
+    }
+}'
+输出示例
+ 
+{
+    "output": {
+        "results": [
+            {
+                "document": {
+                    "text": "文本排序模型广泛用于搜索引擎和推荐系统中，它们根据文本相关性对候选文本进行排序"
+                },
+                "index": 0,
+                "relevance_score": 0.7314485774089865
+            },
+            {
+                "document": {
+                    "text": "预训练语言模型的发展给文本排序模型带来了新的进展"
+                },
+                "index": 2,
+                "relevance_score": 0.5831720487049298
+            },
+            {
+                "document": {
+                    "text": "量子计算是计算科学的一个前沿领域"
+                },
+                "index": 1,
+                "relevance_score": 0.04973238644524712
+            }
+        ]
+    },
+    "usage": {
+        "total_tokens": 79
+    },
+    "request_id": "d09e1029-e3a7-9fee-a7b0-d75af1c73932"
+}
+调用失败示例
+
+在访问请求出错的情况下，输出的结果中会通过code和message指明出错原因。
+
+ 
+{
+    "code":"InvalidApiKey",
+    "message":"Invalid API-key provided.",
+    "request_id":"fb53c4ec-1c12-4fc4-a580-cdb7c3261fc1"
+}
+错误码
+如果模型调用失败并返回报错信息，请参见错误信息进行解决。
+
+计费和限流信息
+为了保证用户调用模型的公平性，百炼大模型平台对于普通用户设置了基础限流。限流是基于模型维度的，并且和调用用户的阿里云主账号相关联，按照该账号下所有API-KEY调用该模型的总和计算限流。如果超出调用限制，用户的API请求将会因为限流控制而失败，用户需要等待一段时间待满足限流条件后方能再次调用。
+
+
+
+
+
+模型名称
+
+计费单价
+
+免费额度
+
+基础限流
+
+gte-rerank-v2
+
+基于输入长度收费
+
+限时免费
+
+100万Token
+
+有效期：百炼开通后180天内
+
+以下条件任何一个超出都会触发限流：
+
+调用频次 ≤ 84 QPS，每秒钟不超过84次API调用。
+
+Token消耗 ≤ 4,980,000,000 TPM，每分钟消耗的Token数目不超过4,980,000,000。
+
+说明
+您可以参阅新人免费额度确认您是否具备享有免费额度的资格，并查询免费总额度、剩余额度及到期时间。
+
+如果您熟悉编程语言，推荐您使用SDK或API调用阿里云百炼平台的大模型，实现灵活定制和开发。SDK或API调用请参考更多。

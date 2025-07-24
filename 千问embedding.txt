@@ -1,0 +1,422 @@
+应用场景
+推荐：根据输入数据推荐相关信息条目。例如，根据用户购买历史和浏览记录推荐相关商品。
+
+聚类：按相关性对输入数据进行分类。例如，将海量新闻按主题归类为科技、体育、娱乐等。
+
+搜索：将搜索结果按照与输入数据的相关性进行排序。例如，文本向量模型可以根据用户搜索词语返回相关网页，多模态向量模型可以实现以文搜图。
+
+异常检测：例如，在金融领域，可以从交易记录中提取特征向量，并标记与正常模式差异较大的交易为潜在欺诈行为。
+
+支持的模型
+通用文本向量
+向量维度指的是向量中包含的元素数量。例如，一个 1024 维的向量包含 1024 个数值。维度越高，向量能表示的信息就越丰富，从而更细致地捕捉文本的特性。
+
+
+
+
+
+
+
+模型名称
+
+向量维度
+
+最大行数
+
+单行最大处理Token数
+
+支持语种
+
+单价（每千输入Token）
+
+免费额度（注）
+
+text-embedding-v4
+
+属于Qwen3-Embedding系列
+2,048、1,536、1,024（默认）、768、512、256、128、64
+
+10
+
+8,192
+
+中文、英语、西班牙语、法语、葡萄牙语、印尼语、日语、韩语、德语、俄罗斯语等100+主流语种
+
+0.0005元
+
+100万Token
+
+有效期：百炼开通后180天内
+
+text-embedding-v3
+
+1,024（默认）、768、512、256、128或64
+
+中文、英语、西班牙语、法语、葡萄牙语、印尼语、日语、韩语、德语、俄罗斯语等50+主流语种
+
+0.0005元
+
+Batch调用：0.00025元
+
+各50万Token
+
+有效期：百炼开通后180天内
+
+text-embedding-v2
+
+1,536
+
+25
+
+2,048
+
+中文、英语、西班牙语、法语、葡萄牙语、印尼语、日语、韩语、德语、俄罗斯语
+
+0.0007元
+
+Batch调用：0.00035元
+
+text-embedding-v1
+
+中文、英语、西班牙语、法语、葡萄牙语、印尼语
+
+text-embedding-async-v2
+
+100,000
+
+中文、英语、西班牙语、法语、葡萄牙语、印尼语、日语、韩语、德语、俄罗斯语
+
+0.0007元
+
+2000万Token
+
+有效期：百炼开通后180天内
+
+text-embedding-async-v1
+
+中文、英语、西班牙语、法语、葡萄牙语、印尼语
+
+模型升级概述
+
+v1、v2、v3模型的效果数据
+
+多模态向量
+模型根据用户的输入生成连续向量，这些输入可以是文本、图片或视频，文件格式详情请参照调用限制。适用于视频分类、图像分类、图文检索等任务场景。
+
+
+
+
+
+
+
+模型名称
+
+数据类型
+
+向量维度
+
+单价
+
+免费额度（注）
+
+限流
+
+multimodal-embedding-v1
+
+float(32)
+
+1,024
+
+免费试用
+
+无加权条目数限制
+
+每分钟调用限制（RPM）：120
+
+选型建议
+首选模型
+对于涉及图像与视频的多模态向量分析，请使用multimodal-embedding-v1。
+
+对于纯文本或涉及代码片段的向量分析，建议选择 text-embedding-v4。效果对齐开源Qwen3-Embedding，并在推理性能上进行了优化。适用于大部分场景：
+
+更多语种支持：覆盖 100+ 主流语种。
+
+代码向量化：新增对编程语言代码片段作为输入的向量化能力，可在 LlamaIndex等框架中构建面向代码片段的向量索引服务。
+
+灵活的向量维度选择：提供 2048、1536、1024、768、512、256、128 和 64 八种维度选择，维度越高，语义表达精度越高，下游任务的计算/存储成本也相应增加。
+
+自定义指令: 为输入内容添加任务说明。例如，在文本检索场景中，可为请求添加instruct参数："Given a web search query, retrieve relevant passages that answer the query"。建议结合具体任务定制提示，并优先使用英文撰写。实际应用中，该方式可带来约 1%–5% 的效果提升。
+
+多样化输出选项：支持稠密向量（dense）和离散向量（sparse），相较于Qwen3-Embedding开源版本,额外支持离散向量，满足不同应用场景需求：
+
+稠密向量：能够更加有效地捕捉文本的语义特征，适用于常规检索和语义匹配场景。
+
+离散向量：降低计算复杂度和存储成本，适用于存储资源有限或需高效语义匹配场景。
+
+对于通过字符串输入的情况，模型会将整个字符串视为单行，输入长度的上限为 8192 Token。如果字符串内容超过此限制，可以使用以下方法调整输入格式：
+
+字符串列表输入：将输入内容拆分为多个部分并生成一个字符串列表。需确保以下条件：
+
+列表中的元素数量不超过 10 个
+
+每个元素的长度需在 8192 Token 内
+
+纯文本文件上传：将输入的字符串内容整合至纯文本文件，通过文件方式上传。需确保以下条件：
+
+文件的总行数不超过 10 行
+
+每行长度在 8192 Token 内
+
+选择 async 版本（大批量文本或高并发场景）
+对于需要高并发或大批量文本处理的场景，建议选择 text-embedding-async-v1 或 text-embedding-async-v2：
+
+大批量文本输入：async 版本单次可处理高达100,000 行的文本信息，每一行文本都会生成一个单独的向量，非常适合大规模数据预处理、批量建库或更新任务。
+
+版本选择建议：async 版本适用于建立或更新向量库等大批量计算场景，但会将结果文件以URL形式返回，用户需要额外步骤下载并处理结果文件，这可能不适用于实时性要求较高的任务。建议根据功能需求选择 v1 或 v2 的 async 版本，且优先选择与现有版本兼容的 async 版本。
+
+快速入门
+您需要已获取API Key并配置API Key到环境变量。如果通过OpenAI SDK或DashScope SDK进行调用，还需要安装SDK。
+
+通用文本向量快速入门
+输入字符串
+OpenAI兼容调用DashScope调用
+PythonNode.jscurl
+
+ 
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    api_key=os.getenv("DASHSCOPE_API_KEY"),  # 如果您没有配置环境变量，请在此处用您的API Key进行替换
+    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"  # 百炼服务的base_url
+)
+
+completion = client.embeddings.create(
+    model="text-embedding-v4",
+    input='衣服的质量杠杠的，很漂亮，不枉我等了这么久啊，喜欢，以后还来这里买',
+    dimensions=1024, # 指定向量维度（仅 text-embedding-v3及 text-embedding-v4支持该参数）
+    encoding_format="float"
+)
+
+print(completion.model_dump_json())
+
+输入字符串列表
+OpenAI兼容调用DashScope调用
+PythonNode.jscurl
+
+ 
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    api_key=os.getenv("DASHSCOPE_API_KEY"),  # 如果您没有配置环境变量，请在此处用您的API Key进行替换
+    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"  # 百炼服务的base_url
+)
+
+completion = client.embeddings.create(
+    model="text-embedding-v4",
+    input=['风急天高猿啸哀', '渚清沙白鸟飞回', '无边落木萧萧下', '不尽长江滚滚来'],
+    dimensions=1024,# 指定向量维度（仅 text-embedding-v3及 text-embedding-v4支持该参数）
+    encoding_format="float"
+)
+
+print(completion.model_dump_json())
+
+输入纯文本文件
+向量化模型可以基于您上传的文档生成嵌入向量。此处以texts_to_embedding.txt作为示例文件。
+
+OpenAI兼容调用DashScope调用
+PythonNode.jscurl
+
+ 
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    api_key=os.getenv("DASHSCOPE_API_KEY"),  # 如果您没有配置环境变量，请在此处用您的API Key进行替换
+    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"  # 百炼服务的base_url
+)
+with open('texts_to_embedding.txt', 'r', encoding='utf-8') as f:
+    completion = client.embeddings.create(
+        model="text-embedding-v4",
+        input=f,
+        dimensions=1024,  # 指定向量维度（仅 text-embedding-v3及 text-embedding-v4支持该参数）
+        encoding_format="float"      
+    )
+print(completion.model_dump_json())
+
+异步处理
+目前，text-embedding-async-v1 与 text-embedding-async-v2 尚未支持 OpenAI 兼容接口。如有需求，可通过Batch调用，使用 text-embedding-v1、text-embedding-v2 或 text-embedding-v3 模型进行批处理。
+PythonJavacurl
+ 
+from dashscope import BatchTextEmbedding
+from http import HTTPStatus
+
+
+# 创建异步任务
+def create_async_task():
+    rsp = BatchTextEmbedding.async_call(model=BatchTextEmbedding.Models.text_embedding_async_v1,
+                                        url="https://modelscope.oss-cn-beijing.aliyuncs.com/resource/text_embedding_file.txt",
+                                        text_type="document")
+    if rsp.status_code == HTTPStatus.OK:
+        print(rsp.output)
+        print(rsp.usage)
+    else:
+        print('Failed, status_code: %s, code: %s, message: %s' %
+              (rsp.status_code, rsp.code, rsp.message))
+    return rsp
+
+
+# 获取异步任务信息
+def fetch_task_status(task):
+    status = BatchTextEmbedding.fetch(task)
+    print(status)
+    if status.status_code == HTTPStatus.OK:
+        print(status.output.task_status)
+    else:
+        print('Failed, status_code: %s, code: %s, message: %s' %
+              (status.status_code, status.code, status.message))
+
+
+# 等待异步任务结束，内部封装轮询逻辑，会一直等待任务结束
+def wait_task(task):
+    rsp = BatchTextEmbedding.wait(task)
+    print(rsp)
+    if rsp.status_code == HTTPStatus.OK:
+        print(rsp.output.task_status)
+    else:
+        print('Failed, status_code: %s, code: %s, message: %s' %
+              (rsp.status_code, rsp.code, rsp.message))
+
+
+# 取消异步任务，只有处于PENDING状态的任务才可以取消
+def cancel_task(task):
+    rsp = BatchTextEmbedding.cancel(task)
+    print(rsp)
+    if rsp.status_code == HTTPStatus.OK:
+        print(rsp.output.task_status)
+    else:
+        print('Failed, status_code: %s, code: %s, message: %s' %
+              (rsp.status_code, rsp.code, rsp.message))
+
+
+if __name__ == '__main__':
+    task_info = create_async_task()
+    fetch_task_status(task_info)
+    wait_task(task_info)
+调用输出
+OpenAI兼容调用DashScope调用
+ 
+{ 
+  "data": [
+    {
+      "embedding": [
+        0.0023064255,
+        -0.009327292,
+        .... 
+        -0.0028842222,
+      ],
+      "index": 0,
+      "object": "embedding"
+    }
+  ],
+  "model":"text-embedding-v3",
+  "object":"list",
+  "usage":{"prompt_tokens":26,"total_tokens":26},
+  "id":"f62c2ae7-0906-9758-ab34-47c5764f07e2"
+}
+多模态向量快速入门
+您需要已获取API Key并配置API Key到环境变量。如果通过SDK调用，还需要安装DashScope SDK。
+
+文本输入图片输入视频输入
+ 
+import dashscope
+import json
+from http import HTTPStatus
+
+text = "通用多模态表征模型示例"
+input = [{'text': text}]
+resp = dashscope.MultiModalEmbedding.call(
+    model="multimodal-embedding-v1",
+    input=input
+)
+
+if resp.status_code == HTTPStatus.OK:
+    print(json.dumps(resp.output, ensure_ascii=False, indent=4))
+输出示例
+
+ 
+{
+    "status_code": 200,
+    "request_id": "23478d14-55c6-98cc-9706-29d23de742fb",
+    "code": "",
+    "message": "",
+    "output": {
+        "embeddings": [
+            {
+                "index": 0,
+                "embedding": [
+                    -0.0396728515625,
+                    0.00650787353515625,
+                    -0.0223388671875,
+                    ...
+                ],
+                "type": "image"
+            }
+        ]
+    },
+    "usage": {
+        "input_tokens": 0,
+        "image_count": 1,
+        "duration": 0
+    }
+}
+使用示例
+实现语义搜索
+实现语义推荐
+API参考
+通用文本向量
+同步接口API详情
+
+批处理接口API详情
+
+多模态向量
+多模态向量
+
+错误码
+如果模型调用失败并返回报错信息，请参见错误信息进行解决。
+
+调用限制
+在调用模型进行向量化前请提前确定输入信息的Token长度未超过限制。汉字与Token数量不完全等价，您可依照一个汉字约等于1-2个Token进行估算或通过Token计算器进行计算。
+
+通用多模态向量API使用过程中存在以下输入类型与格式限制：
+
+
+
+
+输入类型
+
+语种/格式限制
+
+长度/大小限制
+
+文本
+
+中/英文
+
+512个Token, 超过512Token长度的文本内容将会被截断
+
+图片
+
+JPG、PNG、BMP
+
+支持以Base64格式或URL形式输入。可接受的图片大小上限为 3MB
+
+视频
+
+MP4、MPEG、MPG、WEBM、AVI、FLV、MKV、MOV
+
+可接受的视频大小上限为 10MB
+
+接口支持单段文字、单张图片或单个视频文件的上传，也允许不同类型组合（如文字+图片），但每次调用仅限一种组合形式，且每轮对话中每种类型的内容至多包含一项，文件需符合长度/大小要求。
+关于模型的限流条件，请参见限流。
