@@ -1,0 +1,20 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "description": "你是资深产品架构与 AI 工程专家，请帮助我设计“知识产权侵权风险评估平台”的 AI 模块和整体架构。要求技术栈如下：",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xukailiu0602-code/ipLAW.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xukailiu0602-code/ipLAW/issues"
+  },
+  "homepage": "https://github.com/xukailiu0602-code/ipLAW#readme"
+}
